@@ -6,7 +6,6 @@ venv/
 
 # AWS SAM
 .aws-sam 
-samconfig.toml
 out.json
 
 # LocalStack

@@ -10,6 +10,7 @@ services:
       - "127.0.0.1:443:443"              # LocalStack HTTPS Gateway (Pro)
     environment:
       - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN}
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
       - DEBUG=1
       - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=600
     volumes:
