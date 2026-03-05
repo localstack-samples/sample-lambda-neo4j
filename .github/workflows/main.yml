@@ -25,6 +25,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: gautamkrishnar/keepalive-workflow@v1
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
