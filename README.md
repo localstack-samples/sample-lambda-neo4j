@@ -15,17 +15,19 @@ This sample application will guide you through the process of integrating a loca
 
 ## Prerequisites
 
-- [LocalStack Auth Token](https://docs.localstack.cloud/getting-started/auth-token/)
+- LocalStack with the [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
 - [Serverless Application Model](https://docs.localstack.cloud/user-guide/integrations/aws-sam/) with the [`samlocal`](https://github.com/localstack/aws-sam-cli-local) installed.
 - [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal).
 - [Python 3.10](https://www.python.org/downloads/) & `pip`
 - [Docker Compose](https://docs.docker.com/compose/install/)
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
 
 Start LocalStack Pro with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
 ```shell
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-docker-compose up
+make start
+make ready
 ```
 
 The Docker Compose file will start LocalStack Pro and a local Neo4j database. The `LOCALSTACK_AUTH_TOKEN` environment variable is required to activate the LocalStack Pro features, such as Lambda Layers in this example.
