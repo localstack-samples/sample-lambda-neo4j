@@ -15,12 +15,12 @@ This sample application will guide you through the process of integrating a loca
 
 ## Prerequisites
 
-- LocalStack with the [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
-- [Serverless Application Model](https://docs.localstack.cloud/user-guide/integrations/aws-sam/) with the [`samlocal`](https://github.com/localstack/aws-sam-cli-local) installed.
-- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal).
+- LocalStack with the [`lstk` CLI](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/).
+- [Serverless Application Model](https://docs.localstack.cloud/user-guide/integrations/aws-sam/) with `aws-sam-cli` installed, used via the `lstk sam` proxy.
+- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/), required by `lstk aws`.
 - [Python 3.10](https://www.python.org/downloads/) & `pip`
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/aws/getting-started/auth-token/) to activate LocalStack.
 
 Start LocalStack Pro with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
@@ -48,7 +48,7 @@ pip install --target ../package/python -r requirements.txt
 To build the SAM application, run the following command from the root directory of the application:
 
 ```shell
-samlocal build
+lstk sam build
 ```
 
 If you see a `Build Succeeded` message, you can proceed to the next step.
@@ -59,7 +59,7 @@ If you see a `Build Succeeded` message, you can proceed to the next step.
 To deploy the SAM application, run the following command:
 
 ```shell
-samlocal deploy --guided
+lstk sam deploy --guided
 ```
 
 The above command will create a new managed S3 bucket to store the artifacts of the SAM application. If you want to use an existing S3 bucket, you can use the `--s3-bucket` flag to specify the bucket name. Before being deployed, the CloudFormation changeset will be displayed in the terminal. If you want to deploy the application without confirmation, you can use the `--no-confirm-changeset` flag.
@@ -72,8 +72,8 @@ You need to update the Lambda function configuration to use the Neo4j environmen
 export NEO4J_PASSWORD=neo4j-harsh-test
 export NEO4J_URI=bolt://neo4j:7687
 export NEO4J_USERNAME=neo4j
-FUNCTION=$(awslocal cloudformation describe-stack-resource --stack-name sam-app --logical-resource-id function --query 'StackResourceDetail.PhysicalResourceId' --output text)
-awslocal lambda update-function-configuration \
+FUNCTION=$(lstk aws cloudformation describe-stack-resource --stack-name sam-app --logical-resource-id function --query 'StackResourceDetail.PhysicalResourceId' --output text)
+lstk aws lambda update-function-configuration \
     --function-name $FUNCTION \
     --environment "Variables={NEO4J_USERNAME=$NEO4J_USERNAME,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI}"
 ```
@@ -83,7 +83,7 @@ awslocal lambda update-function-configuration \
 You can invoke the Lambda function using the following command:
 
 ```shell
-awslocal lambda invoke \
+lstk aws lambda invoke \
     --function-name $FUNCTION \
     --payload file://event.json \
     --cli-binary-format raw-in-base64-out out.json

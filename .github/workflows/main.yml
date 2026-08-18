@@ -25,8 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: gautamkrishnar/keepalive-workflow@v1
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -42,20 +40,17 @@ jobs:
         with:
           use-installer: true
 
-      - name: Setup SAM-Local 
-        run: |
-          pip install aws-sam-cli-local
-          samlocal --help
+      - name: Install lstk
+        run: npm install -g @localstack/lstk
 
       - name: Start LocalStack
         run: |
-          pip install localstack
           docker pull localstack/localstack-pro:latest
           # Start LocalStack in the background
-          DEBUG=1 localstack start -d
-          # Wait 30 seconds for the LocalStack container to become ready before timing out
+          LOCALSTACK_DEBUG=1 lstk start --non-interactive
+          # Wait for the LocalStack container to become ready before timing out
           echo "Waiting for LocalStack startup..."
-          localstack wait -t 15
+          lstk status
           echo "Startup complete"
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
@@ -65,12 +60,12 @@ jobs:
           cd function
           pip install --target ../package/python -r requirements.txt
 
-      - name: Build the SAM app 
+      - name: Build the SAM app
         run: |
-          samlocal build 
+          lstk sam build
 
       - name: Deploy the SAM app
         run: |
           curl http://localhost:4566/_localstack/info
-          samlocal deploy --no-confirm-changeset
+          lstk sam deploy --no-confirm-changeset
   
