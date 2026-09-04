@@ -65,10 +65,3 @@ jobs:
         run: |
           curl http://localhost:4566/_localstack/info
           lstk sam deploy --no-confirm-changeset
-
-      # Re-enabling the workflow resets GitHub's 60-day scheduled-workflow inactivity timer
-      - name: Keep the scheduled workflow enabled
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api -X PUT repos/${{ github.repository }}/actions/workflows/main.yml/enable
