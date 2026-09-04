@@ -27,7 +27,6 @@ Start LocalStack Pro with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 ```shell
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 make start
-make ready
 ```
 
 The Docker Compose file will start LocalStack Pro and a local Neo4j database. The `LOCALSTACK_AUTH_TOKEN` environment variable is required to activate the LocalStack Pro features, such as Lambda Layers in this example.
