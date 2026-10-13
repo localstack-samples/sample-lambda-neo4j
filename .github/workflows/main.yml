@@ -1,4 +1,4 @@
-name: Deploy on LocalStack 
+name: Deploy on LocalStack
 
 on:
   push:
@@ -15,25 +15,26 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   sam:
     name: Setup infrastructure using SAM
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Setup SAM
         uses: aws-actions/setup-sam@v2
@@ -41,26 +42,25 @@ jobs:
           use-installer: true
 
       - name: Install lstk
-        run: npm install -g @localstack/lstk
-
-      - name: Start LocalStack
         run: |
-          docker pull localstack/localstack-pro:latest
-          # Start LocalStack in the background
-          LOCALSTACK_DEBUG=1 lstk start
+          npm install -g @localstack/lstk
+          lstk setup aws --force --non-interactive
+
+      # Docker Compose puts LocalStack, the Lambda containers and Neo4j on one network,
+      # so the function reaches the database at bolt://neo4j:7687
+      - name: Start LocalStack and Neo4j
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: make start
 
-      - name: Build the Lambda Layer 
-        run: |
-          cd function
-          pip install --target ../package/python -r requirements.txt
+      - name: Build and deploy the SAM app
+        run: make deploy
 
-      - name: Build the SAM app
-        run: |
-          lstk sam build
+      - name: Run tests
+        run: make test
 
-      - name: Deploy the SAM app
+      - name: Show logs
+        if: failure()
         run: |
-          curl http://localhost:4566/_localstack/info
-          lstk sam deploy --no-confirm-changeset
+          docker compose logs --tail 300 localstack || true
+          docker compose logs --tail 100 neo4j || true

@@ -1,12 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: An AWS Lambda application that calls the Lambda API.
+Parameters:
+  Neo4jUri:
+    Type: String
+    Default: bolt://neo4j:7687
+    Description: Bolt URI of the Neo4j database, reachable from the Lambda container
+  Neo4jUsername:
+    Type: String
+    Default: neo4j
+  Neo4jPassword:
+    Type: String
+    Default: neo4j-harsh-test
+    NoEcho: true
 Resources:
   function:
     Type: AWS::Serverless::Function
     Properties:
       Handler: lambda_function.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.12
       CodeUri: function/.
       Description: Call the AWS Lambda API
       Timeout: 600
@@ -15,6 +27,11 @@ Resources:
         - AWSLambda_ReadOnlyAccess
         - AWSXrayWriteOnlyAccess
       Tracing: Active
+      Environment:
+        Variables:
+          NEO4J_URI: !Ref Neo4jUri
+          NEO4J_USERNAME: !Ref Neo4jUsername
+          NEO4J_PASSWORD: !Ref Neo4jPassword
       Layers:
         - !Ref libs
   libs:
@@ -24,4 +41,4 @@ Resources:
       Description: Dependencies for the aura-lambda sample app.
       ContentUri: package/.
       CompatibleRuntimes:
-        - python3.10
+        - python3.12
