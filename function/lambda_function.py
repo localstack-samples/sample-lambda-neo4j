@@ -38,7 +38,7 @@ def lambda_handler(event, context):
     logger.info("## CONNECTING TO %s" % neo4j_uri)
 
     with driver.session() as session:
-        session.write_transaction(write_graph_record, event)
+        session.execute_write(write_graph_record, event)
 
     response = client.get_account_settings()
     return response['AccountUsage']
